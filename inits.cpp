@@ -197,7 +197,7 @@ void initADC(void)
 	// ADCSRB settings
 	//---------------------------------------------------------------------
 
-	sbi(ADCSRB,ADHSM);
+	cbi(ADCSRB,ADHSM);
 
 	cbi(ADCSRB,MUX5);
 
@@ -241,18 +241,16 @@ void initADC(void)
 	// power consumption in the digital input buffer.
 	// Note that ADC pins ADC7 and ADC6 do not have digital input buffers,
 	// and therefore do not require Digital Input Disable bits.
-	//sbi(DIDR0,ADC5D);
-	//sbi(DIDR0,ADC4D);
-	////sbi(DIDR0,ADC3D);
-	////sbi(DIDR0,ADC2D);
-	//sbi(DIDR0,ADC1D);
-	//sbi(DIDR0,ADC0D);
-	//sbi(DIDR2,ADC8D);
-	//sbi(DIDR2,ADC9D);
-	//sbi(DIDR2,ADC10D);
-	//sbi(DIDR2,ADC11D);
-	//sbi(DIDR2,ADC12D);
-	//sbi(DIDR2,ADC13D);
+	sbi(DIDR0,ADC5D);
+	sbi(DIDR0,ADC4D);
+	sbi(DIDR0,ADC1D);
+	sbi(DIDR0,ADC0D);
+	sbi(DIDR2,ADC8D);
+	sbi(DIDR2,ADC9D);
+	sbi(DIDR2,ADC10D);
+	sbi(DIDR2,ADC11D);
+	sbi(DIDR2,ADC12D);
+	sbi(DIDR2,ADC13D);
 }
 
 //-----------------------------------------------------------------------------

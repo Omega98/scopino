@@ -40,7 +40,7 @@ volatile  boolean wait;
          uint16_t waitDuration;
 volatile uint16_t stopIndex;
 volatile uint16_t ADCCounter;
-volatile  uint8_t ADCBuffer[ADCBUFFERSIZE];
+volatile uint8_t ADCBuffer[ADCBUFFERSIZE];
 volatile  boolean freeze;
 
           uint8_t prescaler;

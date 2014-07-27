@@ -34,6 +34,11 @@ inline void ISRADC_vect()
 	// than 8-bit precision is required, it is sufficient to read ADCH.
 	// Otherwise, ADCL must be read first, then ADCH.
 	ADCBuffer[ADCCounter] = ADCH;
+ // byte low = ADCL;
+ // byte high = ADCH;
+	//ADCBuffer[ADCCounter] = high;
+	//ADCBuffer[ADCCounter] = ADCBuffer[ADCCounter] << 2;
+	//ADCBuffer[ADCCounter] |= low >> 6;
 
 	ADCCounter = ( ADCCounter + 1 ) % ADCBUFFERSIZE;
 

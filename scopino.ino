@@ -22,6 +22,10 @@
 // Includes
 //-----------------------------------------------------------------------------
 
+#include "settings.h"
+#include "isr.h"
+#include "interface.h"
+#include "inits.h"
 #include "scopino.h"
 
 //-----------------------------------------------------------------------------
@@ -45,6 +49,17 @@ volatile  boolean freeze;
 
              char commandBuffer[COMBUFFERSIZE+1];
 
+void message(int nb)
+{
+  for (int i=0; i<nb; i++)
+  {
+    digitalWrite(errorPin, HIGH);
+    delay(10);
+    digitalWrite(errorPin, LOW);
+    delay(90);
+  }
+}
+
 //-----------------------------------------------------------------------------
 // Main routines
 //-----------------------------------------------------------------------------
@@ -54,6 +69,10 @@ volatile  boolean freeze;
 void setup (void) {		// Setup of the microcontroller
 	// Open serial port with a baud rate of BAUDRATE b/s
 	Serial.begin(BAUDRATE);
+  while(!Serial)
+  {
+    message(3);
+  }
 
 	dshow("# setup()");
 	// Clear buffers
@@ -61,7 +80,7 @@ void setup (void) {		// Setup of the microcontroller
 	memset( (void *)commandBuffer, 0, sizeof(commandBuffer) );
 	ADCCounter = 0;
 	wait = false;
-	waitDuration = ADCBUFFERSIZE - 32;
+	waitDuration = 5; // ADCBUFFERSIZE - 32;
 	stopIndex = -1;
 	freeze = false;
 
@@ -82,13 +101,14 @@ void setup (void) {		// Setup of the microcontroller
 }
 
 void loop (void) {
-	dprint(ADCCounter);
+  static boolean restart = false;
+	/*dprint(ADCCounter);
 	dprint(stopIndex);
 	dprint(wait);
-	dprint(freeze);
+	dprint(freeze);*/
 	#if DEBUG == 1
-	Serial.println( ADCSRA, BIN );
-	Serial.println( ADCSRB, BIN );
+	/*Serial.println( ADCSRA, BIN );
+	Serial.println( ADCSRB, BIN );*/
 	#endif
 
 	// If freeze flag is set, then it is time to send the buffer to the serial port
@@ -100,8 +120,18 @@ void loop (void) {
 		//Serial.print("Buffer: ");
 		//Serial.write( ADCBuffer, ADCBUFFERSIZE );
 		//Serial.print("End of Buffer");
-		Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADCBUFFERSIZE - ADCCounter );
-		Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
+    for (int i=ADCCounter; i<ADCBUFFERSIZE; i++)
+    {
+      Serial.print("i:"); Serial.print(i); Serial.print(" ");
+      Serial.println(ADCBuffer[i], DEC);
+    }
+    for (int i=0; i<ADCCounter; i++)
+    {
+      Serial.print("i:"); Serial.print(i); Serial.print(" ");
+      Serial.println(ADCBuffer[i], DEC);
+    }
+		//Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADCBUFFERSIZE - ADCCounter );
+		//Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
 
 		// Turn off errorPin
 		//digitalWrite( errorPin, LOW );
@@ -111,15 +141,18 @@ void loop (void) {
 		freeze = false;
 
 		// Clear buffer
-		//memset( (void *)ADCBuffer, 0, sizeof(ADCBuffer) );
+    if (restart)
+    {
+		  memset( (void *)ADCBuffer, 0, sizeof(ADCBuffer) );
 
-		//startADC();
-		// Let the ADC fill the buffer a little bit
-		//delay(1);
-		//startAnalogComparator();
+		  startADC();
+		  // Let the ADC fill the buffer a little bit
+		  delay(1);
+		  startAnalogComparator();
+    }
 
 		#if DEBUG == 1
-		delay(3000);
+		// delay(3000);
 		#endif
 	}
 
@@ -138,9 +171,11 @@ void loop (void) {
 				// Let the ADC fill the buffer a little bit
 				//delay(1);
 				startAnalogComparator();
+        restart = true;
 				break;
-			case 'S':			// 'S' for stopping ADC conversions
+			case 'x':			// 'S' for stopping ADC conversions
 				//Serial.println("ADC conversions stopped");
+        restart = false;
 				stopAnalogComparator();
 				stopADC();
 				break;

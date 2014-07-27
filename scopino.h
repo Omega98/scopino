@@ -28,13 +28,13 @@
 // Defines and Typedefs
 //-----------------------------------------------------------------------------
 
-#define DEBUG		0
+#define DEBUG		1
 
-#define ADCBUFFERSIZE	1280
+#define ADCBUFFERSIZE	16
 
 #define ADCPIN		0
 #define errorPin	13
-#define thresholdPin	3
+#define thresholdPin	5
 
 #define BAUDRATE	115200	// Baud rate of UART in bps
 #define COMMANDDELAY	10	// ms to wait for the filling of Serial buffer
@@ -81,7 +81,7 @@ void error (void);
 void fillBuffer( \
 	char *buffer, \
 	byte bufferSize, \
-	HardwareSerial::HardwareSerial* serial = &Serial );
+	Serial_* serial = &Serial );
 void printStatus(void);
 
 //-----------------------------------------------------------------------------

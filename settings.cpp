@@ -46,12 +46,12 @@ void stopADC( void )
 void startAnalogComparator( void )
 {
 	// Enable Analog Comparator Interrupt
-	sbi(ACSR,ACIE);
+	// sbi(ACSR,ACIE);
 }
 void stopAnalogComparator( void )
 {
 	// Disable Analog Comparator interrupt
-	cbi( ACSR,ACIE );
+	// cbi( ACSR,ACIE );
 }
 
 //-----------------------------------------------------------------------------
@@ -155,7 +155,7 @@ void setVoltageReference( uint8_t reference )
 void setTriggerEvent( uint8_t TriggerEvent )
 {
 	dshow("# setTriggerEvent()");
-	dprint(event);
+	dprint("event");
 	// These bits determine which comparator events that trigger the Analog
 	// Comparator interrupt.
 	//	ACIS1	ACIS0	Mode

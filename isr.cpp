@@ -27,7 +27,7 @@
 //-----------------------------------------------------------------------------
 // ADC Conversion Complete Interrupt
 //-----------------------------------------------------------------------------
-ISR(ADC_vect)
+inline void ISRADC_vect()
 {
 	// When ADCL is read, the ADC Data Register is not updated until ADCH
 	// is read. Consequently, if the result is left adjusted and no more
@@ -36,6 +36,13 @@ ISR(ADC_vect)
 	ADCBuffer[ADCCounter] = ADCH;
 
 	ADCCounter = ( ADCCounter + 1 ) % ADCBUFFERSIZE;
+
+  // todo
+  if (ADCCounter >= 10)
+  {
+  	wait = true;
+	  stopIndex = ( ADCCounter + waitDuration ) % ADCBUFFERSIZE;
+  }
 
 	if ( wait )
 	{
@@ -49,6 +56,8 @@ ISR(ADC_vect)
 		}
 	}
 }
+ISR(ADC_vect)
+{ ISRADC_vect(); }
 
 //-----------------------------------------------------------------------------
 // Analog Comparator interrupt

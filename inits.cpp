@@ -2,6 +2,7 @@
 // Inits.cpp
 //-----------------------------------------------------------------------------
 // Copyright 2012 Cristiano Lino Fontana
+// Copyright 2014 Eric Trepanier
 //
 // This file is part of Girino.
 //
@@ -29,90 +30,94 @@
 //-----------------------------------------------------------------------------
 void initPins(void)
 {
-	////---------------------------------------------------------------------
-	//// TCCR2A settings
-	////---------------------------------------------------------------------
-	//// These bits control the Output Compare pin (OC2A) behavior. If one or
-	//// both of the COM2A1:0 bits are set, the OC2A output overrides the
-	//// normal port functionality of the I/O pin it is connected to.
-	//// However, note that the Data Direction Register (DDR) bit
-	//// corresponding to the OC2A pin must be set in order to enable the
-	//// output driver.
-	//// When OC2A is connected to the pin, the function of the COM2A1:0 bits
-	//// depends on the WGM22:0 bit setting.
-	////
-	//// Fast PWM Mode
-	////	COM2A1	COM2A0
-	////	0	0	Normal port operation, OC2A disconnected.
-	////	0	1	WGM22 = 0: Normal Port Operation, OC0A Disconnected.
-	////			WGM22 = 1: Toggle OC2A on Compare Match.
-	////	1	0	Clear OC2A on Compare Match, set OC2A at BOTTOM
-	////	1	1	Clear OC2A on Compare Match, clear OC2A at BOTTOM
+	// NOTE: There is no TIMER2 in ATmega32U4.
+
+	//---------------------------------------------------------------------
+	// TCCR2A settings
+	//---------------------------------------------------------------------
+	// These bits control the Output Compare pin (OC2A) behavior. If one or
+	// both of the COM2A1:0 bits are set, the OC2A output overrides the
+	// normal port functionality of the I/O pin it is connected to.
+	// However, note that the Data Direction Register (DDR) bit
+	// corresponding to the OC2A pin must be set in order to enable the
+	// output driver.
+	// When OC2A is connected to the pin, the function of the COM2A1:0 bits
+	// depends on the WGM22:0 bit setting.
+	//
+	// Fast PWM Mode
+	//	COM2A1	COM2A0
+	//	0	0	Normal port operation, OC2A disconnected.
+	//	0	1	WGM22 = 0: Normal Port Operation, OC0A Disconnected.
+	//			WGM22 = 1: Toggle OC2A on Compare Match.
+	//	1	0	Clear OC2A on Compare Match, set OC2A at BOTTOM
+	//	1	1	Clear OC2A on Compare Match, clear OC2A at BOTTOM
 	//cbi(TCCR1A,COM1A1);
 	//cbi(TCCR1A,COM1A0);
 	//sbi(TCCR1A,COM1B1);
 	//cbi(TCCR1A,COM1B0);
 
-	//// Combined with the WGM22 bit found in the TCCR2B Register, these bits
-	//// control the counting sequence of the counter, the source for maximum
-	//// (TOP) counter value, and what type of waveform generation to be used
-	//// Modes of operation supported by the Timer/Counter unit are:
-	////	- Normal mode (counter),
-	////	- Clear Timer on Compare Match (CTC) mode,
-	////	- two types of Pulse Width Modulation (PWM) modes.
-	////
-	////	Mode	WGM22	WGM21	WGM20	Operation	TOP
-	////	0	0	0	0	Normal		0xFF
-	////	1	0	0	1	PWM		0xFF
-	////	2	0	1	0	CTC		OCRA
-	////	3	0	1	1	Fast PWM	0xFF
-	////	4	1	0	0	Reserved	-
-	////	5	1	0	1	PWM		OCRA
-	////	6	1	1	0	Reserved	-
-	////	7	1	1	1	Fast PWM	OCRA
+	// Combined with the WGM22 bit found in the TCCR2B Register, these bits
+	// control the counting sequence of the counter, the source for maximum
+	// (TOP) counter value, and what type of waveform generation to be used
+	// Modes of operation supported by the Timer/Counter unit are:
+	//	- Normal mode (counter),
+	//	- Clear Timer on Compare Match (CTC) mode,
+	//	- two types of Pulse Width Modulation (PWM) modes.
+	//
+	//	Mode	WGM22	WGM21	WGM20	Operation	TOP
+	//	0	0	0	0	Normal		0xFF
+	//	1	0	0	1	PWM		0xFF
+	//	2	0	1	0	CTC		OCRA
+	//	3	0	1	1	Fast PWM	0xFF
+	//	4	1	0	0	Reserved	-
+	//	5	1	0	1	PWM		OCRA
+	//	6	1	1	0	Reserved	-
+	//	7	1	1	1	Fast PWM	OCRA
 	//cbi(TCCR1B,WGM13);
 	//sbi(TCCR1B,WGM12);
 	//cbi(TCCR1A,WGM11);
 	//sbi(TCCR1A,WGM10);
 
-	////---------------------------------------------------------------------
-	//// TCCR2B settings
-	////---------------------------------------------------------------------
-	//// The FOC2A bit is only active when the WGM bits specify a non-PWM
-	//// mode.
-	//// However, for ensuring compatibility with future devices, this bit
-	//// must be set to zero when TCCR2B is written when operating in PWM
-	//// mode. When writing a logical one to the FOC2A bit, an immediate
-	//// Compare Match is forced on the Waveform Generation unit. The OC2A
-	//// output is changed according to its COM2A1:0 bits setting. Note that
-	//// the FOC2A bit is implemented as a strobe. Therefore it is the value
-	//// present in the COM2A1:0 bits that determines the effect of the
-	//// forced compare.
-	//// A FOC2A strobe will not generate any interrupt, nor will it clear
-	//// the timer in CTC mode using OCR2A as TOP.
-	//// The FOC2A bit is always read as zero.
+	//---------------------------------------------------------------------
+	// TCCR2B settings
+	//---------------------------------------------------------------------
+	// The FOC2A bit is only active when the WGM bits specify a non-PWM
+	// mode.
+	// However, for ensuring compatibility with future devices, this bit
+	// must be set to zero when TCCR2B is written when operating in PWM
+	// mode. When writing a logical one to the FOC2A bit, an immediate
+	// Compare Match is forced on the Waveform Generation unit. The OC2A
+	// output is changed according to its COM2A1:0 bits setting. Note that
+	// the FOC2A bit is implemented as a strobe. Therefore it is the value
+	// present in the COM2A1:0 bits that determines the effect of the
+	// forced compare.
+	// A FOC2A strobe will not generate any interrupt, nor will it clear
+	// the timer in CTC mode using OCR2A as TOP.
+	// The FOC2A bit is always read as zero.
 	//cbi(TCCR1C,FOC1A);
 	//cbi(TCCR1C,FOC1B);
 
-	//// The three Clock Select bits select the clock source to be used by
-	//// the Timer/Counter.
-	////	CS22	CS21	CS20	Prescaler
-	////	0	0	0	No clock source (Timer/Counter stopped).
-	////	0	0	1	No prescaling
-	////	0	1	0	8
-	////	0	1	1	32
-	////	1	0	0	64
-	////	1	0	1	128
-	////	1	1	0	256
-	////	1	1	1	1024
+	// The three Clock Select bits select the clock source to be used by
+	// the Timer/Counter.
+	//	CS22	CS21	CS20	Prescaler
+	//	0	0	0	No clock source (Timer/Counter stopped).
+	//	0	0	1	No prescaling
+	//	0	1	0	8
+	//	0	1	1	32
+	//	1	0	0	64
+	//	1	0	1	128
+	//	1	1	0	256
+	//	1	1	1	1024
 	//cbi(TCCR1B,CS12);
 	//cbi(TCCR1B,CS11);
 	//sbi(TCCR1B,CS10);
 
-	pinMode( errorPin, OUTPUT ); 
-	pinMode( thresholdPin, OUTPUT );
+	// ERRORPIN is written logic one when trigger condition is met
+	pinMode( ERRORPIN, OUTPUT ); 
 
-	analogWrite( thresholdPin, 127 );
+	// Analog comparator is not used since positive input is not selectable on ATmega32U4.
+	// pinMode( thresholdPin, OUTPUT );
+	// analogWrite( thresholdPin, 127 );
 }
   
 //-----------------------------------------------------------------------------
@@ -132,7 +137,7 @@ void initADC(void)
 	//	0	0	AREF, Internal Vref turned off
 	//	0	1	AVCC with external capacitor at AREF pin
 	//	1	0	Reserved
-	//	1	1	Internal 1.1V Voltage Reference with external
+	//	1	1	Internal 2.56V Voltage Reference with external
 	//			capacitor at AREF pin
 	cbi(ADMUX,REFS1);
 	sbi(ADMUX,REFS0);
@@ -142,11 +147,13 @@ void initADC(void)
 	// bit will affect the ADC Data Register immediately, regardless of any
 	// ongoing conversions.
 	sbi(ADMUX,ADLAR);
-	// The value of these bits selects which analog inputs are connected to
-	// the ADC. If these bits are changed during a conversion, the change
-	// will not go in effect until this conversion is complete (ADIF in
-	// ADCSRA is set).
-	// ADMUX |= ( ADCPIN & 0x07 );
+	// The value of these bits selects which combination of analog 
+	// inputs are connected to the ADC. These bits also select the 
+	// gain for the differential channels. If these bits are changed 
+	// during a conversion, the change will not go in effect until this 
+	// conversion is complete (ADIF in ADCSRA is set).
+	// Note: bit 5 is in ADCSRB.
+	cbi(ADCSRB,MUX5);
 	cbi(ADMUX,MUX4);
 	cbi(ADMUX,MUX3);
 	cbi(ADMUX,MUX2);
@@ -196,39 +203,42 @@ void initADC(void)
 	//---------------------------------------------------------------------
 	// ADCSRB settings
 	//---------------------------------------------------------------------
-
+	// Writing this bit to one enables the ADC High Speed mode. This mode 
+	// enables higher conversion rate at the expense of higher power 
+	// consumption.
 	cbi(ADCSRB,ADHSM);
-
-	cbi(ADCSRB,MUX5);
-
 	// When this bit is written logic one and the ADC is switched off
 	// (ADEN in ADCSRA is zero), the ADC multiplexer selects the negative
 	// input to the Analog Comparator. When this bit is written logic zero,
-	// AIN1 is applied to the negative input of the Analog Comparator.
-	cbi(ADCSRB,ACME); // connecter bandgap reference au AIN(-) 
+	// the Bandgap reference is applied to the negative input of the Analog 
+	// Comparator.
+	cbi(ADCSRB,ACME);
 	// If ADATE in ADCSRA is written to one, the value of these bits
 	// selects which source will trigger an ADC conversion. If ADATE is
-	// cleared, the ADTS2:0 settings will have no effect. A conversion will
+	// cleared, the ADTS3:0 settings will have no effect. A conversion will
 	// be triggered by the rising edge of the selected Interrupt Flag. Note
 	// that switching from a trigger source that is cleared to a trigger
 	// source that is set, will generate a positive edge on the trigger
 	// signal. If ADEN in ADCSRA is set, this will start a conversion.
-	// Switching to Free Running mode (ADTS[2:0]=0) will not cause a
+	// Switching to Free Running mode (ADTS[3:0]=0) will not cause a
 	// trigger event, even if the ADC Interrupt Flag is set.
-	//	ADTS2	ADTS1	ADTS0	Trigger source
-	//	0	0	0	Free Running mode
-	//	0	0	1	Analog Comparator
-	//	0	1	0	External Interrupt Request 0
-	//	0	1	1	Timer/Counter0 Compare Match A
-	//	1	0	0	Timer/Counter0 Overflow
-	//	1	0	1	Timer/Counter1 Compare Match B
-	//	1	1	0	Timer/Counter1 Overflow
-	//	1	1	1	Timer/Counter1 Capture Event
-	cbi(ADCSRB,ADTS3); // ajouté pour leonardo
+	//	ADTS3	ADTS2	ADTS1	ADTS0	Trigger source
+	//	0	0	0	0	Free Running mode
+	//	0	0	0	1	Analog Comparator
+	//	0	0	1	0	External Interrupt Request 0
+	//	0	0	1	1	Timer/Counter0 Compare Match A
+	//	0	1	0	0	Timer/Counter0 Overflow
+	//	0	1	0	1	Timer/Counter1 Compare Match B
+	//	0	1	1	0	Timer/Counter1 Overflow
+	//	0	1	1	1	Timer/Counter1 Capture Event
+	//	1	0	0	0	Timer/Counter4 Overflow
+	//	1	0	0	1	Timer/Counter4 Compare Match A
+	//	1	0	1	0	Timer/Counter4 Compare Match B
+	//	1	0	1	1	Timer/Counter4 Compare Match D
+	cbi(ADCSRB,ADTS3);
 	cbi(ADCSRB,ADTS2);
 	cbi(ADCSRB,ADTS1);
 	cbi(ADCSRB,ADTS0);
-
 
 	//---------------------------------------------------------------------
 	// DIDR0 settings
@@ -236,15 +246,25 @@ void initADC(void)
 	// When this bit is written logic one, the digital input buffer on the
 	// corresponding ADC pin is disabled. The corresponding PIN Register
 	// bit will always read as zero when this bit is set. When an analog
-	// signal is applied to the ADC5..0 pin and the digital input from this
+	// signal is applied to the ADC7..4/1..0 pin and the digital input from this
 	// pin is not needed, this bit should be written logic one to reduce
 	// power consumption in the digital input buffer.
-	// Note that ADC pins ADC7 and ADC6 do not have digital input buffers,
-	// and therefore do not require Digital Input Disable bits.
+	sbi(DIDR0,ADC7D);
+	sbi(DIDR0,ADC6D);
 	sbi(DIDR0,ADC5D);
 	sbi(DIDR0,ADC4D);
 	sbi(DIDR0,ADC1D);
 	sbi(DIDR0,ADC0D);
+
+	//---------------------------------------------------------------------
+	// DIDR2 settings
+	//---------------------------------------------------------------------
+	// When this bit is written logic one, the digital input buffer on the
+	// corresponding ADC pin is disabled. The corresponding PIN Register
+	// bit will always read as zero when this bit is set. When an analog
+	// signal is applied to the ADC13..8 pin and the digital input from this
+	// pin is not needed, this bit should be written logic one to reduce
+	// power consumption in the digital input buffer.
 	sbi(DIDR2,ADC8D);
 	sbi(DIDR2,ADC9D);
 	sbi(DIDR2,ADC10D);
@@ -258,6 +278,9 @@ void initADC(void)
 //-----------------------------------------------------------------------------
 void initAnalogComparator(void)
 {
+	// Analog Comparator in ATmega32U4 is not usable as intended in 
+	// original Girino (positive input is not selectable).
+
 	////---------------------------------------------------------------------
 	//// ACSR settings
 	////---------------------------------------------------------------------

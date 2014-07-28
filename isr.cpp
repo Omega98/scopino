@@ -2,6 +2,7 @@
 // ISR.cpp
 //-----------------------------------------------------------------------------
 // Copyright 2012 Cristiano Lino Fontana
+// Copyright 2014 Eric Trepanier
 //
 // This file is part of Girino.
 //
@@ -33,31 +34,33 @@ inline void ISRADC_vect()
 	// is read. Consequently, if the result is left adjusted and no more
 	// than 8-bit precision is required, it is sufficient to read ADCH.
 	// Otherwise, ADCL must be read first, then ADCH.
+	// 8-bit readings
 	ADCBuffer[ADCCounter] = ADCH;
- // byte low = ADCL;
- // byte high = ADCH;
+	
+	// 10-bit readings
+	//byte low = ADCL;
+	//byte high = ADCH;
 	//ADCBuffer[ADCCounter] = high;
 	//ADCBuffer[ADCCounter] = ADCBuffer[ADCCounter] << 2;
 	//ADCBuffer[ADCCounter] |= low >> 6;
 
-  // todo
-  if (!wait && enabletrig)
-  {
-    if (ADCBuffer[ADCCounter] < threshold)
+    // todo
+    if (!wait && enabletrig)
     {
-      crossdown = true;
-    }
+        if (ADCBuffer[ADCCounter] < threshold)
+        {
+            crossdown = true;
+        }
 
-    if (crossdown && (ADCBuffer[ADCCounter] >= threshold))
-    //if (ADCCounter==0)
-    {
-	    sbi( PORTC, PORTC7 );
-  	  wait = true;
-	    stopIndex = ( ADCCounter + waitDuration ) % ADCBUFFERSIZE;
+        if (crossdown && (ADCBuffer[ADCCounter] >= threshold))
+        //if (ADCCounter==0)
+        {
+            sbi( PORTC, PORTC7 );
+            wait = true;
+            stopIndex = ( ADCCounter + waitDuration ) % ADCBUFFERSIZE;
+        }
     }
-  }
-  //
-
+    //
   
 	ADCCounter = ( ADCCounter + 1 ) % ADCBUFFERSIZE;
 

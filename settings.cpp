@@ -2,6 +2,7 @@
 // Settings.cpp
 //-----------------------------------------------------------------------------
 // Copyright 2012 Cristiano Lino Fontana
+// Copyright 2014 Eric Trepanier
 //
 // This file is part of Girino.
 //
@@ -45,15 +46,15 @@ void stopADC( void )
 //-----------------------------------------------------------------------------
 void startAnalogComparator( void )
 {
-  enabletrig = true;
-	// Enable Analog Comparator Interrupt
-	// sbi(ACSR,ACIE);
+    enabletrig = true;
+    // Enable Analog Comparator Interrupt
+    // sbi(ACSR,ACIE);
 }
 void stopAnalogComparator( void )
 {
-  enabletrig = false;
-	// Disable Analog Comparator interrupt
-	// cbi( ACSR,ACIE );
+    enabletrig = false;
+    // Disable Analog Comparator interrupt
+    // cbi( ACSR,ACIE );
 }
 
 //-----------------------------------------------------------------------------
@@ -134,7 +135,7 @@ void setVoltageReference( uint8_t reference )
 	//	0	0	AREF, Internal Vref turned off
 	//	0	1	AVCC with external capacitor at AREF pin
 	//	1	0	Reserved
-	//	1	1	Internal 1.1V Voltage Reference with external
+	//	1	1	Internal 2.56V Voltage Reference with external
 	//			capacitor at AREF pin
 	switch (reference)
 	{
@@ -157,7 +158,8 @@ void setVoltageReference( uint8_t reference )
 void setTriggerEvent( uint8_t TriggerEvent )
 {
 	dshow("# setTriggerEvent()");
-	dprint("event");
+	dprint(TriggerEvent);
+    dshow("not used");
 	// These bits determine which comparator events that trigger the Analog
 	// Comparator interrupt.
 	//	ACIS1	ACIS0	Mode
@@ -165,19 +167,19 @@ void setTriggerEvent( uint8_t TriggerEvent )
 	//	0	1	Reserved
 	//	1	0	Falling edge
 	//	1	1	Rising edge
-	switch (TriggerEvent)
-	{
-	case 0:
-		cbi(ACSR,ACIS1);
-		cbi(ACSR,ACIS0);
-		break;
-	case 2:
-		sbi(ACSR,ACIS1);
-		cbi(ACSR,ACIS0);
-		break;
-	case 3:
-	default:
-		sbi(ACSR,ACIS1);
-		sbi(ACSR,ACIS0);
-	}
+	//switch (TriggerEvent)
+	//{
+	//case 0:
+	//	cbi(ACSR,ACIS1);
+	//	cbi(ACSR,ACIS0);
+	//	break;
+	//case 2:
+	//	sbi(ACSR,ACIS1);
+	//	cbi(ACSR,ACIS0);
+	//	break;
+	//case 3:
+	//default:
+	//	sbi(ACSR,ACIS1);
+	//	sbi(ACSR,ACIS0);
+	//}
 }

@@ -2,6 +2,7 @@
 // Girino.ino
 //-----------------------------------------------------------------------------
 // Copyright 2012 Cristiano Lino Fontana
+// Copyright 2014 Eric Trepanier
 //
 // This file is part of Girino.
 //
@@ -39,10 +40,10 @@
 volatile  boolean wait;
 volatile  boolean crossdown;
           boolean enabletrig;
-         uint16_t waitDuration;
+		 uint16_t waitDuration;
 volatile uint16_t stopIndex;
 volatile uint16_t ADCCounter;
-volatile uint8_t ADCBuffer[ADCBUFFERSIZE];
+volatile  uint8_t ADCBuffer[ADCBUFFERSIZE];
 volatile  boolean freeze;
 
           uint8_t prescaler;
@@ -51,15 +52,16 @@ volatile  boolean freeze;
 
              char commandBuffer[COMBUFFERSIZE+1];
 
+// Signals a message using the onboard LED on pin 13
 void message(int nb)
 {
-  for (int i=0; i<nb; i++)
-  {
-    digitalWrite(errorPin, HIGH);
-    delay(10);
-    digitalWrite(errorPin, LOW);
-    delay(90);
-  }
+    for (int i=0; i<nb; i++)
+    {
+        digitalWrite(errorPin, HIGH);
+        delay(10);
+        digitalWrite(errorPin, LOW);
+        delay(90);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -76,18 +78,18 @@ void setup (void) {		// Setup of the microcontroller
 	// Clear buffers
 	memset( (void *)ADCBuffer, 0, sizeof(ADCBuffer) );
 	memset( (void *)commandBuffer, 0, sizeof(commandBuffer) );
+
 	ADCCounter = 0;
 	wait = false;
-  crossdown = false;
-  enabletrig = false;
+    crossdown = false;
+    enabletrig = false;
+	threshold = 10;
 	waitDuration = ADCBUFFERSIZE - 32;
 	stopIndex = -1;
 	freeze = false;
 
 	prescaler = 128;
-	triggerEvent = 3;
-
-	threshold = 10;
+	triggerEvent = 3; // not used
 
 	// Activate interrupts
 	sei();
@@ -96,112 +98,125 @@ void setup (void) {		// Setup of the microcontroller
 	initADC();
 	initAnalogComparator();
 
-  //tone(2, 1000);
+    // Generate calibrating signal on Digital Pin 2
+    //tone(2, 1000);
 
-  while(!Serial)
-  {
-    message(3);
-  }
-	Serial.println("Girino ready");
-	//printStatus();
-
+    while(!Serial)
+    {
+        message(3);
+    }
+    Serial.println("Girino ready");
+    printStatus();
 }
 
 void loop (void) {
-  static boolean restart = false;
-	/*dprint(ADCCounter);
-	dprint(stopIndex);
-	dprint(wait);
-	dprint(freeze);*/
-	#if DEBUG == 1
-	/*Serial.println( ADCSRA, BIN );
-	Serial.println( ADCSRB, BIN );*/
-	#endif
+    static boolean restart = false;
+    //dprint(ADCCounter);
+    //dprint(stopIndex);
+    //dprint(wait);
+    //dprint(freeze);
+#if DEBUG == 1
+    //Serial.println( ADCSRA, BIN );
+    //Serial.println( ADCSRB, BIN );
+#endif
 
-  while(!Serial)
-  {
-    message(3);
-  }
+    // Warn the user that the serial port is not opened
+    // and wait for a connection
+    while(!Serial)
+    {
+        message(3);
+    }
 
 	// If freeze flag is set, then it is time to send the buffer to the serial port
 	if ( freeze )
 	{
-		//dshow("# Frozen");
+        //dshow("# Frozen");
 
-    //dprint(ADCCounter);
-	  //dprint(stopIndex);
-	  //dprint(wait);
-	  //dprint(freeze);
+        //dprint(ADCCounter);
+        //dprint(stopIndex);
+        //dprint(wait);
+        //dprint(freeze);
     
-		// Send buffer through serial port in the right order
-    //for (int i=ADCCounter; i<ADCBUFFERSIZE; i++)
-    //{
-    //  Serial.print("i;"); Serial.print(i); Serial.print(";b;");
-    //  //Serial.print(i); Serial.print(";");
-    //  Serial.println(ADCBuffer[i], DEC);
-    //}
-    //for (int i=0; i<ADCCounter; i++)
-    //{
-    //  Serial.print("i;"); Serial.print(i); Serial.print(";b;");
-    //  //Serial.print(i); Serial.print(";");
-    //  Serial.println(ADCBuffer[i], DEC);
-    //}
+#if DEBUG == 1
+        // Display the buffer in human readable form
+        //for (int i=ADCCounter; i<ADCBUFFERSIZE; i++)
+        //{
+        //  Serial.print("i;"); Serial.print(i); Serial.print(";b;");
+        //  //Serial.print(i); Serial.print(";");
+        //  Serial.println(ADCBuffer[i], DEC);
+        //}
+        //for (int i=0; i<ADCCounter; i++)
+        //{
+        //  Serial.print("i;"); Serial.print(i); Serial.print(";b;");
+        //  //Serial.print(i); Serial.print(";");
+        //  Serial.println(ADCBuffer[i], DEC);
+        //}
+#endif
 
-    Serial.write(255);
-		Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADCBUFFERSIZE - ADCCounter );
-		Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
+        // Send buffer through serial port in the right order
+        Serial.write(255);
+        Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADCBUFFERSIZE - ADCCounter );
+        Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
 
-		// Turn off errorPin
-		//digitalWrite( errorPin, LOW );
+		// Ensure ERRORPIN is off
 		cbi(PORTC,PORTC7);
 
-		wait = false;
-    crossdown = false;
-    enabletrig = false;
-		freeze = false;
+        // Reset flags
+        wait = false;
+        crossdown = false;
+        enabletrig = false;
+        freeze = false;
 
-		// Clear buffer
-    if (restart)
-    {
-		  memset( (void *)ADCBuffer, 0, sizeof(ADCBuffer) );
+        // If restart is on, automatically start another acquisition
+        if (restart)
+        {
+            // Clear buffer
+            memset( (void *)ADCBuffer, 0, sizeof(ADCBuffer) );
 
-		  startADC();
-		  // Let the ADC fill the buffer a little bit
-		  delay(10);
-		  startAnalogComparator();
-    }
+            startADC();
+            // Let the ADC fill the buffer a little bit (holdoff)
+            delay(10);
+            // Look for a trigger
+            startAnalogComparator();
+        }
 
-		#if DEBUG == 1
-		// delay(3000);
-		#endif
+#if DEBUG == 1
+        // delay(3000);
+#endif
 	}
 
+    // Commands polling
 	if ( Serial.available() > 0 ) {
 		// Read the incoming byte
 		char theChar = Serial.read();
-			// Parse character
+		// Parse character
 		switch (theChar) {
 			case 's':			// 's' for starting ADC conversions
-				//Serial.println("ADC conversions started");
+				Serial.println("ADC conversions started");
 
-				// Clear buffer
-				memset( (void *)ADCBuffer, 0, sizeof(ADCBuffer) );
+                // Clear buffer
+                memset( (void *)ADCBuffer, 0, sizeof(ADCBuffer) );
 
-				startADC();
-				// Let the ADC fill the buffer a little bit
-				delay(10);
-				startAnalogComparator();
-        restart = true;
-				break;
-			case 'x':			// 'S' for stopping ADC conversions
-				//Serial.println("ADC conversions stopped");
-        restart = false;
-				stopAnalogComparator();
-				stopADC();
-		    cbi(PORTC,PORTC7);
-				break;
+                startADC();
+                // Let the ADC fill the buffer a little bit (holdoff)
+                delay(10);
+                // Look for a trigger
+                startAnalogComparator();
+
+                // Activate auto restart
+                restart = true;
+                break;
+
+            case 'x':			// 'x' for stopping ADC conversions
+                Serial.println("ADC conversions stopped");
+                
+                stopAnalogComparator();
+                stopADC();
+                cbi(PORTC,PORTC7);
+                break;
+
 			case 'p':			// 'p' for new prescaler setting
-			case 'P': {
+			case 'P': 
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -216,11 +231,10 @@ void loop (void) {
 
 				prescaler = newP;
 				setADCPrescaler(newP);
-				}
 				break;
 
 			case 'r':			// 'r' for new voltage reference setting
-			case 'R': {
+			case 'R': 
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -234,11 +248,10 @@ void loop (void) {
 				Serial.println(newR);
 
 				setVoltageReference(newR);
-				}
 				break;
 
 			case 'e':			// 'e' for new trigger event setting
-			case 'E': {
+			case 'E': 
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -253,11 +266,10 @@ void loop (void) {
 
 				triggerEvent = newE;
 				setTriggerEvent(newE);
-				}
 				break;
 
 			case 'w':			// 'w' for new wait setting
-			case 'W': {
+			case 'W': 
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -271,11 +283,10 @@ void loop (void) {
 				Serial.println(newW);
 
 				waitDuration = newW;
-				}
 				break;
 
-			case 't':			// 'w' for new threshold setting
-			case 'T': {
+			case 't':			// 't' for new threshold setting
+			case 'T': 
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -289,8 +300,6 @@ void loop (void) {
 				Serial.println(newT);
 
 				threshold = newT;
-				//analogWrite( thresholdPin, threshold );
-				}
 				break;
 
 			case 'd':			// 'd' for display status

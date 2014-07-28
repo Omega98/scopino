@@ -2,6 +2,7 @@
 // Girino.h
 //-----------------------------------------------------------------------------
 // Copyright 2012 Cristiano Lino Fontana
+// Copyright 2014 Eric Trepanier
 //
 // This file is part of Girino.
 //
@@ -32,8 +33,8 @@
 
 #define ADCBUFFERSIZE	1280
 
-#define ADCPIN		0
-#define errorPin	13
+#define ADCPIN		B000000
+#define ERRORPIN	13
 #define thresholdPin	5
 
 #define BAUDRATE	115200	// Baud rate of UART in bps

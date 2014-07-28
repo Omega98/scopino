@@ -2,6 +2,7 @@
 // Interface.cpp
 //-----------------------------------------------------------------------------
 // Copyright 2012 Cristiano Lino Fontana
+// Copyright 2014 Eric Trepanier
 //
 // This file is part of Girino.
 //
@@ -25,21 +26,22 @@
 #include "scopino.h"
 
 //-----------------------------------------------------------------------------
+// error
+//-----------------------------------------------------------------------------
 void error (void) {
-	digitalWrite( errorPin, HIGH );
+	digitalWrite( ERRORPIN, HIGH );
 	delay( 500 );
-	digitalWrite( errorPin, LOW );
+	digitalWrite( ERRORPIN, LOW );
 	delay( 250 );
-	digitalWrite( errorPin, HIGH );
+	digitalWrite( ERRORPIN, HIGH );
 	delay( 500 );
-	digitalWrite( errorPin, LOW );
+	digitalWrite( ERRORPIN, LOW );
 }
 
 //-----------------------------------------------------------------------------
 // fillBuffer
 //-----------------------------------------------------------------------------
 // Fills the given buffer with bufferSize chars from a Serial object
-
 void fillBuffer( char *buffer, byte bufferSize, Serial_* serial )
 {
 	// Clean buffer

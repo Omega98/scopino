@@ -40,14 +40,26 @@ inline void ISRADC_vect()
 	//ADCBuffer[ADCCounter] = ADCBuffer[ADCCounter] << 2;
 	//ADCBuffer[ADCCounter] |= low >> 6;
 
-	ADCCounter = ( ADCCounter + 1 ) % ADCBUFFERSIZE;
-
   // todo
-  if (ADCCounter >= 10)
+  if (!wait && enabletrig)
   {
-  	wait = true;
-	  stopIndex = ( ADCCounter + waitDuration ) % ADCBUFFERSIZE;
+    if (ADCBuffer[ADCCounter] < threshold)
+    {
+      crossdown = true;
+    }
+
+    if (crossdown && (ADCBuffer[ADCCounter] >= threshold))
+    //if (ADCCounter==0)
+    {
+	    sbi( PORTC, PORTC7 );
+  	  wait = true;
+	    stopIndex = ( ADCCounter + waitDuration ) % ADCBUFFERSIZE;
+    }
   }
+  //
+
+  
+	ADCCounter = ( ADCCounter + 1 ) % ADCBUFFERSIZE;
 
 	if ( wait )
 	{
@@ -74,7 +86,7 @@ ISR(ANALOG_COMP_vect)
 
 	// Turn on errorPin
 	//digitalWrite( errorPin, HIGH );
-	sbi( PORTB, PORTB5 );
+	sbi( PORTC, PORTC7 );
 
 	wait = true;
 	stopIndex = ( ADCCounter + waitDuration ) % ADCBUFFERSIZE;

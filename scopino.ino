@@ -37,6 +37,8 @@
 //-----------------------------------------------------------------------------
 
 volatile  boolean wait;
+volatile  boolean crossdown;
+          boolean enabletrig;
          uint16_t waitDuration;
 volatile uint16_t stopIndex;
 volatile uint16_t ADCCounter;
@@ -69,10 +71,6 @@ void message(int nb)
 void setup (void) {		// Setup of the microcontroller
 	// Open serial port with a baud rate of BAUDRATE b/s
 	Serial.begin(BAUDRATE);
-  while(!Serial)
-  {
-    message(3);
-  }
 
 	dshow("# setup()");
 	// Clear buffers
@@ -80,14 +78,16 @@ void setup (void) {		// Setup of the microcontroller
 	memset( (void *)commandBuffer, 0, sizeof(commandBuffer) );
 	ADCCounter = 0;
 	wait = false;
-	waitDuration = 5; // ADCBUFFERSIZE - 32;
+  crossdown = false;
+  enabletrig = false;
+	waitDuration = ADCBUFFERSIZE - 32;
 	stopIndex = -1;
 	freeze = false;
 
 	prescaler = 128;
 	triggerEvent = 3;
 
-	threshold = 127;
+	threshold = 10;
 
 	// Activate interrupts
 	sei();
@@ -96,8 +96,15 @@ void setup (void) {		// Setup of the microcontroller
 	initADC();
 	initAnalogComparator();
 
+  //tone(2, 1000);
+
+  while(!Serial)
+  {
+    message(3);
+  }
 	Serial.println("Girino ready");
 	//printStatus();
+
 }
 
 void loop (void) {
@@ -111,33 +118,46 @@ void loop (void) {
 	Serial.println( ADCSRB, BIN );*/
 	#endif
 
+  while(!Serial)
+  {
+    message(3);
+  }
+
 	// If freeze flag is set, then it is time to send the buffer to the serial port
 	if ( freeze )
 	{
-		dshow("# Frozen");
+		//dshow("# Frozen");
 
+    //dprint(ADCCounter);
+	  //dprint(stopIndex);
+	  //dprint(wait);
+	  //dprint(freeze);
+    
 		// Send buffer through serial port in the right order
-		//Serial.print("Buffer: ");
-		//Serial.write( ADCBuffer, ADCBUFFERSIZE );
-		//Serial.print("End of Buffer");
-    for (int i=ADCCounter; i<ADCBUFFERSIZE; i++)
-    {
-      Serial.print("i:"); Serial.print(i); Serial.print(" ");
-      Serial.println(ADCBuffer[i], DEC);
-    }
-    for (int i=0; i<ADCCounter; i++)
-    {
-      Serial.print("i:"); Serial.print(i); Serial.print(" ");
-      Serial.println(ADCBuffer[i], DEC);
-    }
-		//Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADCBUFFERSIZE - ADCCounter );
-		//Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
+    //for (int i=ADCCounter; i<ADCBUFFERSIZE; i++)
+    //{
+    //  Serial.print("i;"); Serial.print(i); Serial.print(";b;");
+    //  //Serial.print(i); Serial.print(";");
+    //  Serial.println(ADCBuffer[i], DEC);
+    //}
+    //for (int i=0; i<ADCCounter; i++)
+    //{
+    //  Serial.print("i;"); Serial.print(i); Serial.print(";b;");
+    //  //Serial.print(i); Serial.print(";");
+    //  Serial.println(ADCBuffer[i], DEC);
+    //}
+
+    Serial.write(255);
+		Serial.write( (uint8_t *)ADCBuffer + ADCCounter, ADCBUFFERSIZE - ADCCounter );
+		Serial.write( (uint8_t *)ADCBuffer, ADCCounter );
 
 		// Turn off errorPin
 		//digitalWrite( errorPin, LOW );
-		cbi(PORTB,PORTB5);
+		cbi(PORTC,PORTC7);
 
 		wait = false;
+    crossdown = false;
+    enabletrig = false;
 		freeze = false;
 
 		// Clear buffer
@@ -147,7 +167,7 @@ void loop (void) {
 
 		  startADC();
 		  // Let the ADC fill the buffer a little bit
-		  delay(1);
+		  delay(10);
 		  startAnalogComparator();
     }
 
@@ -169,7 +189,7 @@ void loop (void) {
 
 				startADC();
 				// Let the ADC fill the buffer a little bit
-				//delay(1);
+				delay(10);
 				startAnalogComparator();
         restart = true;
 				break;
@@ -178,6 +198,7 @@ void loop (void) {
         restart = false;
 				stopAnalogComparator();
 				stopADC();
+		    cbi(PORTC,PORTC7);
 				break;
 			case 'p':			// 'p' for new prescaler setting
 			case 'P': {
@@ -268,7 +289,7 @@ void loop (void) {
 				Serial.println(newT);
 
 				threshold = newT;
-				analogWrite( thresholdPin, threshold );
+				//analogWrite( thresholdPin, threshold );
 				}
 				break;
 

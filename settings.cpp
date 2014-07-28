@@ -45,11 +45,13 @@ void stopADC( void )
 //-----------------------------------------------------------------------------
 void startAnalogComparator( void )
 {
+  enabletrig = true;
 	// Enable Analog Comparator Interrupt
 	// sbi(ACSR,ACIE);
 }
 void stopAnalogComparator( void )
 {
+  enabletrig = false;
 	// Disable Analog Comparator interrupt
 	// cbi( ACSR,ACIE );
 }

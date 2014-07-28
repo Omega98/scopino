@@ -30,7 +30,7 @@
 
 #define DEBUG		1
 
-#define ADCBUFFERSIZE	16
+#define ADCBUFFERSIZE	1280
 
 #define ADCPIN		0
 #define errorPin	13
@@ -88,6 +88,8 @@ void printStatus(void);
 // Global Variables
 //-----------------------------------------------------------------------------
 extern volatile  boolean wait;
+extern volatile  boolean crossdown;
+extern           boolean enabletrig;
 extern          uint16_t waitDuration;
 extern volatile uint16_t stopIndex;
 extern volatile uint16_t ADCCounter;

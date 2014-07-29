@@ -57,9 +57,9 @@ void message(int nb)
 {
     for (int i=0; i<nb; i++)
     {
-        digitalWrite(errorPin, HIGH);
+        digitalWrite(ERRORPIN, HIGH);
         delay(10);
-        digitalWrite(errorPin, LOW);
+        digitalWrite(ERRORPIN, LOW);
         delay(90);
     }
 }
@@ -191,7 +191,7 @@ void loop (void) {
 		char theChar = Serial.read();
 		// Parse character
 		switch (theChar) {
-			case 's':			// 's' for starting ADC conversions
+			case 's':	{		// 's' for starting ADC conversions
 				Serial.println("ADC conversions started");
 
                 // Clear buffer
@@ -214,9 +214,9 @@ void loop (void) {
                 stopADC();
                 cbi(PORTC,PORTC7);
                 break;
-
+                }
 			case 'p':			// 'p' for new prescaler setting
-			case 'P': 
+			case 'P': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -232,9 +232,9 @@ void loop (void) {
 				prescaler = newP;
 				setADCPrescaler(newP);
 				break;
-
+                }
 			case 'r':			// 'r' for new voltage reference setting
-			case 'R': 
+			case 'R': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -249,9 +249,9 @@ void loop (void) {
 
 				setVoltageReference(newR);
 				break;
-
+                }
 			case 'e':			// 'e' for new trigger event setting
-			case 'E': 
+			case 'E': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -267,9 +267,9 @@ void loop (void) {
 				triggerEvent = newE;
 				setTriggerEvent(newE);
 				break;
-
+                }
 			case 'w':			// 'w' for new wait setting
-			case 'W': 
+			case 'W': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -284,9 +284,9 @@ void loop (void) {
 
 				waitDuration = newW;
 				break;
-
+                      }
 			case 't':			// 't' for new threshold setting
-			case 'T': 
+			case 'T': {
 				// Wait for COMMANDDELAY ms to be sure that the Serial buffer is filled
 				delay(COMMANDDELAY);
 
@@ -301,12 +301,12 @@ void loop (void) {
 
 				threshold = newT;
 				break;
-
+                }
 			case 'd':			// 'd' for display status
-			case 'D':
+			case 'D': {
 				printStatus();
 				break;
-
+                }
 			default:
 				// Display error message
 				Serial.print("ERROR: Command not found, it was: ");

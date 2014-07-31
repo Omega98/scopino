@@ -99,7 +99,7 @@ void setup (void) {		// Setup of the microcontroller
 	initAnalogComparator();
 
     // Generate calibrating signal on Digital Pin 2
-    //tone(2, 1000);
+    tone(2, 60);
 
     while(!Serial)
     {
@@ -175,7 +175,7 @@ void loop (void) {
 
             startADC();
             // Let the ADC fill the buffer a little bit (holdoff)
-            delay(10);
+            delay(104);
             // Look for a trigger
             startAnalogComparator();
         }
@@ -276,13 +276,13 @@ void loop (void) {
 				fillBuffer( commandBuffer, COMBUFFERSIZE );
 
 				// Convert buffer to integer
-				uint8_t newW = atoi( commandBuffer );
+				uint16_t newW = atoi( commandBuffer );
 
 				// Display moving status indicator
 				Serial.print("Setting waitDuration to: ");
 				Serial.println(newW);
 
-				waitDuration = newW;
+				waitDuration = ADCBUFFERSIZE - newW;
 				break;
                       }
 			case 't':			// 't' for new threshold setting
